@@ -121,8 +121,9 @@ class TestMain:
         captured = capsys.readouterr()
         assert "does not exist" in captured.out
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_basic_success(self, mock_reporter_class, temp_project_dir, capsys):
+    def test_main_basic_success(self, mock_reporter_class, mock_get_formatter, temp_project_dir, capsys):
         """Test successful basic execution."""
         # Mock the reporter
         mock_reporter = MagicMock()
@@ -135,18 +136,25 @@ class TestMain:
                 "runtime_packages": 0,
                 "dev_packages": 0,
                 "optional_packages": 0,
-                "requires_attribution": 0
+                "requires_attribution": 0,
+                "unknown_licenses": 0
             }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir)]):
             result = main()
-        
+
         assert result == 0
         mock_reporter.generate_report.assert_called_once()
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_with_output_file(self, mock_reporter_class, temp_project_dir):
+    def test_main_with_output_file(self, mock_reporter_class, mock_get_formatter, temp_project_dir):
         """Test main with output file."""
         # Mock the reporter
         mock_reporter = MagicMock()
@@ -159,12 +167,18 @@ class TestMain:
                 "runtime_packages": 0,
                 "dev_packages": 0,
                 "optional_packages": 0,
-                "requires_attribution": 0
+                "requires_attribution": 0,
+                "unknown_licenses": 0
             }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         output_file = temp_project_dir / "report.txt"
-        
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '-o', str(output_file)]):
             result = main()
         
@@ -172,20 +186,33 @@ class TestMain:
         assert output_file.exists()
         mock_reporter.generate_report.assert_called_once()
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_all_deps_option(self, mock_reporter_class, temp_project_dir):
+    def test_main_all_deps_option(self, mock_reporter_class, mock_get_formatter, temp_project_dir):
         """Test main with --all-deps option."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.return_value = {
             "project": "test-project",
             "packages": [],
-            "summary": {"total_packages": 0, "requires_attribution": 0}
+            "summary": {
+                "total_packages": 0,
+                "runtime_packages": 0,
+                "dev_packages": 0,
+                "optional_packages": 0,
+                "requires_attribution": 0,
+                "unknown_licenses": 0
+            }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '--all-deps']):
             result = main()
-        
+
         assert result == 0
         # Should call with include_dev=True, include_optional=True, runtime_only=False
         mock_reporter.generate_report.assert_called_once_with(
@@ -196,20 +223,33 @@ class TestMain:
             project_name=None
         )
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_runtime_only_option(self, mock_reporter_class, temp_project_dir):
+    def test_main_runtime_only_option(self, mock_reporter_class, mock_get_formatter, temp_project_dir):
         """Test main with --runtime-only option."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.return_value = {
             "project": "test-project",
             "packages": [],
-            "summary": {"total_packages": 0, "requires_attribution": 0}
+            "summary": {
+                "total_packages": 0,
+                "runtime_packages": 0,
+                "dev_packages": 0,
+                "optional_packages": 0,
+                "requires_attribution": 0,
+                "unknown_licenses": 0
+            }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '--runtime-only']):
             result = main()
-        
+
         assert result == 0
         # Should call with runtime_only=True
         mock_reporter.generate_report.assert_called_once_with(
@@ -220,20 +260,33 @@ class TestMain:
             project_name=None
         )
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_exclude_patterns(self, mock_reporter_class, temp_project_dir):
+    def test_main_exclude_patterns(self, mock_reporter_class, mock_get_formatter, temp_project_dir):
         """Test main with exclude patterns."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.return_value = {
             "project": "test-project",
             "packages": [],
-            "summary": {"total_packages": 0, "requires_attribution": 0}
+            "summary": {
+                "total_packages": 0,
+                "runtime_packages": 0,
+                "dev_packages": 0,
+                "optional_packages": 0,
+                "requires_attribution": 0,
+                "unknown_licenses": 0
+            }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '--exclude', 'test*,dev*']):
             result = main()
-        
+
         assert result == 0
         # Should call with exclude_patterns
         mock_reporter.generate_report.assert_called_once_with(
@@ -244,20 +297,33 @@ class TestMain:
             project_name=None
         )
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_legacy_mode(self, mock_reporter_class, temp_project_dir):
+    def test_main_legacy_mode(self, mock_reporter_class, mock_get_formatter, temp_project_dir):
         """Test main with legacy mode."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.return_value = {
             "project": "OSI (Open Source Installer)",
             "packages": [],
-            "summary": {"total_packages": 0, "requires_attribution": 0}
+            "summary": {
+                "total_packages": 0,
+                "runtime_packages": 0,
+                "dev_packages": 0,
+                "optional_packages": 0,
+                "requires_attribution": 0,
+                "unknown_licenses": 0
+            }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '--legacy-mode']):
             result = main()
-        
+
         assert result == 0
         # Should call with legacy OSI settings
         mock_reporter.generate_report.assert_called_once_with(
@@ -265,35 +331,54 @@ class TestMain:
             project_name="OSI (Open Source Installer)"
         )
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_json_format(self, mock_reporter_class, temp_project_dir, capsys):
+    def test_main_json_format(self, mock_reporter_class, mock_get_formatter, temp_project_dir, capsys):
         """Test main with JSON format."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.return_value = {
             "project": "test-project",
             "packages": [],
-            "summary": {"total_packages": 0, "requires_attribution": 0}
+            "summary": {
+                "total_packages": 0,
+                "runtime_packages": 0,
+                "dev_packages": 0,
+                "optional_packages": 0,
+                "requires_attribution": 0,
+                "unknown_licenses": 0
+            }
         }
-        
+
+        # Mock the formatter
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = '{"project": "test-project", "packages": []}'
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir), '--format', 'json']):
             result = main()
-        
+
         assert result == 0
         captured = capsys.readouterr()
         # Should output valid JSON
         assert '"project": "test-project"' in captured.out
 
+    @patch('license_reporter.cli.get_formatter')
     @patch('license_reporter.cli.LicenseReporter')
-    def test_main_error_handling(self, mock_reporter_class, temp_project_dir, capsys):
+    def test_main_error_handling(self, mock_reporter_class, mock_get_formatter, temp_project_dir, capsys):
         """Test main error handling."""
         mock_reporter = MagicMock()
         mock_reporter_class.return_value = mock_reporter
         mock_reporter.generate_report.side_effect = Exception("Test error")
-        
+
+        # Mock the formatter (though it won't be called due to the exception)
+        mock_formatter = MagicMock()
+        mock_get_formatter.return_value = mock_formatter
+        mock_formatter.format.return_value = "test output"
+
         with patch('sys.argv', ['license-reporter', str(temp_project_dir)]):
             result = main()
-        
+
         assert result == 1
         captured = capsys.readouterr()
         assert "Error generating license report" in captured.out
