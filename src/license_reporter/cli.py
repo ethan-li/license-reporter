@@ -8,6 +8,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import __version__
 from .core import LicenseReporter
 from .formatters import get_formatter
 
@@ -53,6 +54,9 @@ Examples:
   license-reporter --include-dev --include-optional --format json --output licenses.json
         """
     )
+
+    # Version argument
+    parser.add_argument("--version", action="version", version=f"license-reporter {__version__}")
 
     # Positional argument for project path
     parser.add_argument("project_path", nargs="?", default=".",
