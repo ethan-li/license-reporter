@@ -64,6 +64,7 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
 
   test-package-build:
     runs-on: ubuntu-latest
