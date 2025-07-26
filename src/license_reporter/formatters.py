@@ -71,46 +71,52 @@ class TextFormatter(BaseFormatter):
         lines.append("")
 
         # Dependency files analyzed
-        if report.get('dependency_files'):
+        if report.get("dependency_files"):
             lines.append("DEPENDENCY FILES ANALYZED:")
-            for file_path in report['dependency_files']:
+            for file_path in report["dependency_files"]:
                 lines.append(f"  - {file_path}")
             lines.append("")
 
         # Summary statistics
-        summary = report['summary']
+        summary = report["summary"]
         lines.append("SUMMARY:")
         lines.append(f"  Total packages: {summary['total_packages']}")
-        if summary.get('runtime_packages', 0) > 0:
+        if summary.get("runtime_packages", 0) > 0:
             lines.append(f"  Runtime packages: {summary['runtime_packages']}")
-        if summary.get('dev_packages', 0) > 0:
+        if summary.get("dev_packages", 0) > 0:
             lines.append(f"  Development packages: {summary['dev_packages']}")
-        if summary.get('optional_packages', 0) > 0:
+        if summary.get("optional_packages", 0) > 0:
             lines.append(f"  Optional packages: {summary['optional_packages']}")
-        lines.append(f"  Packages requiring attribution: {summary['requires_attribution']}")
+        lines.append(
+            f"  Packages requiring attribution: {summary['requires_attribution']}"
+        )
         lines.append(f"  Packages with unknown licenses: {summary['unknown_licenses']}")
         lines.append("")
 
         # Filters applied
-        filters = report.get('filters_applied', {})
+        filters = report.get("filters_applied", {})
         if any(filters.values()):
             lines.append("FILTERS APPLIED:")
-            if filters.get('runtime_only'):
-                lines.append("  - Runtime dependencies only (PyInstaller compliance mode)")
-            if filters.get('include_dev'):
+            if filters.get("runtime_only"):
+                lines.append(
+                    "  - Runtime dependencies only (PyInstaller compliance mode)"
+                )
+            if filters.get("include_dev"):
                 lines.append("  - Development dependencies included")
-            if filters.get('include_optional'):
+            if filters.get("include_optional"):
                 lines.append("  - Optional dependencies included")
-            if filters.get('exclude_patterns'):
-                lines.append(f"  - Excluded patterns: {', '.join(filters['exclude_patterns'])}")
+            if filters.get("exclude_patterns"):
+                lines.append(
+                    f"  - Excluded patterns: {', '.join(filters['exclude_patterns'])}"
+                )
             lines.append("")
 
         # Excluded build tools
-        if report.get('excluded_build_tools'):
+        if report.get("excluded_build_tools"):
             lines.append("EXCLUDED BUILD-TIME DEPENDENCIES:")
             lines.append("The following build tools are excluded as they are not")
             lines.append("distributed with the PyInstaller executable:")
-            excluded = ", ".join(sorted(report['excluded_build_tools']))
+            excluded = ", ".join(sorted(report["excluded_build_tools"]))
             lines.append(f"{excluded}")
             lines.append("")
 
@@ -122,13 +128,17 @@ class TextFormatter(BaseFormatter):
         for package in report["packages"]:
             lines.append(f"Package: {package['name']}")
             lines.append(f"Version: {package['version']}")
-            if package.get('version_spec'):
+            if package.get("version_spec"):
                 lines.append(f"Version Spec: {package['version_spec']}")
-            lines.append(f"Dependency Type: {package.get('dependency_type', 'unknown')}")
+            lines.append(
+                f"Dependency Type: {package.get('dependency_type', 'unknown')}"
+            )
             lines.append(f"License: {package['license']}")
             lines.append(f"Author: {package['author']}")
             lines.append(f"Homepage: {package['homepage']}")
-            lines.append(f"Requires Attribution: {'Yes' if package['requires_attribution'] else 'No'}")
+            lines.append(
+                f"Requires Attribution: {'Yes' if package['requires_attribution'] else 'No'}"
+            )
             lines.append("-" * 40)
             lines.append("")
 
@@ -137,13 +147,13 @@ class TextFormatter(BaseFormatter):
 
 class JSONFormatter(BaseFormatter):
     """Format reports as JSON."""
-    
+
     def format(self, report: Dict) -> str:
         """Format report as JSON.
-        
+
         Args:
             report: Report dictionary to format
-            
+
         Returns:
             JSON-formatted report
         """
@@ -152,13 +162,13 @@ class JSONFormatter(BaseFormatter):
 
 class MarkdownFormatter(BaseFormatter):
     """Format reports as Markdown."""
-    
+
     def format(self, report: Dict) -> str:
         """Format report as Markdown.
-        
+
         Args:
             report: Report dictionary to format
-            
+
         Returns:
             Markdown-formatted report
         """
@@ -172,25 +182,29 @@ class MarkdownFormatter(BaseFormatter):
         lines.append("")
 
         # Summary
-        summary = report['summary']
+        summary = report["summary"]
         lines.append("## Summary")
         lines.append("")
         lines.append(f"- **Total packages:** {summary['total_packages']}")
-        if summary.get('runtime_packages', 0) > 0:
+        if summary.get("runtime_packages", 0) > 0:
             lines.append(f"- **Runtime packages:** {summary['runtime_packages']}")
-        if summary.get('dev_packages', 0) > 0:
+        if summary.get("dev_packages", 0) > 0:
             lines.append(f"- **Development packages:** {summary['dev_packages']}")
-        if summary.get('optional_packages', 0) > 0:
+        if summary.get("optional_packages", 0) > 0:
             lines.append(f"- **Optional packages:** {summary['optional_packages']}")
-        lines.append(f"- **Packages requiring attribution:** {summary['requires_attribution']}")
-        lines.append(f"- **Packages with unknown licenses:** {summary['unknown_licenses']}")
+        lines.append(
+            f"- **Packages requiring attribution:** {summary['requires_attribution']}"
+        )
+        lines.append(
+            f"- **Packages with unknown licenses:** {summary['unknown_licenses']}"
+        )
         lines.append("")
 
         # Dependency files
-        if report.get('dependency_files'):
+        if report.get("dependency_files"):
             lines.append("## Dependency Files Analyzed")
             lines.append("")
-            for file_path in report['dependency_files']:
+            for file_path in report["dependency_files"]:
                 lines.append(f"- `{file_path}`")
             lines.append("")
 
@@ -201,13 +215,15 @@ class MarkdownFormatter(BaseFormatter):
         lines.append("|---------|---------|------|---------|---------------------|")
 
         for package in report["packages"]:
-            name = package['name']
-            version = package['version']
-            dep_type = package.get('dependency_type', 'unknown')
-            license_info = package['license']
-            attribution = 'Yes' if package['requires_attribution'] else 'No'
+            name = package["name"]
+            version = package["version"]
+            dep_type = package.get("dependency_type", "unknown")
+            license_info = package["license"]
+            attribution = "Yes" if package["requires_attribution"] else "No"
 
-            lines.append(f"| {name} | {version} | {dep_type} | {license_info} | {attribution} |")
+            lines.append(
+                f"| {name} | {version} | {dep_type} | {license_info} | {attribution} |"
+            )
 
         lines.append("")
 
@@ -219,14 +235,20 @@ class MarkdownFormatter(BaseFormatter):
             lines.append(f"### {package['name']}")
             lines.append("")
             lines.append(f"- **Version:** {package['version']}")
-            if package.get('version_spec'):
-                lines.append(f"- **Version Specification:** `{package['version_spec']}`")
-            lines.append(f"- **Dependency Type:** {package.get('dependency_type', 'unknown')}")
+            if package.get("version_spec"):
+                lines.append(
+                    f"- **Version Specification:** `{package['version_spec']}`"
+                )
+            lines.append(
+                f"- **Dependency Type:** {package.get('dependency_type', 'unknown')}"
+            )
             lines.append(f"- **License:** {package['license']}")
             lines.append(f"- **Author:** {package['author']}")
-            if package['homepage'] != 'unknown':
+            if package["homepage"] != "unknown":
                 lines.append(f"- **Homepage:** {package['homepage']}")
-            lines.append(f"- **Requires Attribution:** {'Yes' if package['requires_attribution'] else 'No'}")
+            lines.append(
+                f"- **Requires Attribution:** {'Yes' if package['requires_attribution'] else 'No'}"
+            )
             lines.append("")
 
         return "\n".join(lines)
@@ -234,23 +256,25 @@ class MarkdownFormatter(BaseFormatter):
 
 def get_formatter(format_type: str) -> BaseFormatter:
     """Get a formatter instance for the specified format.
-    
+
     Args:
         format_type: Type of formatter ('text', 'json', 'markdown')
-        
+
     Returns:
         Formatter instance
-        
+
     Raises:
         ValueError: If format_type is not supported
     """
     formatters = {
-        'text': TextFormatter,
-        'json': JSONFormatter,
-        'markdown': MarkdownFormatter,
+        "text": TextFormatter,
+        "json": JSONFormatter,
+        "markdown": MarkdownFormatter,
     }
-    
+
     if format_type not in formatters:
-        raise ValueError(f"Unsupported format: {format_type}. Supported formats: {list(formatters.keys())}")
-    
+        raise ValueError(
+            f"Unsupported format: {format_type}. Supported formats: {list(formatters.keys())}"
+        )
+
     return formatters[format_type]()

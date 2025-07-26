@@ -130,7 +130,7 @@ def sample_report_data():
                 "license": "Apache Software License",
                 "author": "Kenneth Reitz",
                 "homepage": "https://requests.readthedocs.io",
-                "requires_attribution": True
+                "requires_attribution": True,
             },
             {
                 "name": "click",
@@ -140,8 +140,8 @@ def sample_report_data():
                 "license": "BSD License",
                 "author": "Pallets",
                 "homepage": "https://palletsprojects.com/p/click/",
-                "requires_attribution": True
-            }
+                "requires_attribution": True,
+            },
         ],
         "summary": {
             "total_packages": 2,
@@ -149,13 +149,13 @@ def sample_report_data():
             "dev_packages": 0,
             "optional_packages": 0,
             "requires_attribution": 2,
-            "unknown_licenses": 0
+            "unknown_licenses": 0,
         },
         "excluded_build_tools": [],
         "filters_applied": {
             "include_dev": False,
             "include_optional": False,
             "runtime_only": False,
-            "exclude_patterns": []
-        }
+            "exclude_patterns": [],
+        },
     }

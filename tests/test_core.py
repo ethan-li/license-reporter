@@ -42,7 +42,7 @@ class TestDependencyInfo:
         dep1 = DependencyInfo("requests", ">=2.25.0", "dev")
         dep2 = DependencyInfo("requests", ">=2.25.0", "dev")
         dep3 = DependencyInfo("click", ">=8.0.0", "runtime")
-        
+
         assert dep1 == dep2
         assert dep1 != dep3
         assert dep1 != "not a dependency"
@@ -51,7 +51,7 @@ class TestDependencyInfo:
         """Test that DependencyInfo objects are hashable."""
         dep1 = DependencyInfo("requests", ">=2.25.0", "dev")
         dep2 = DependencyInfo("requests", ">=2.25.0", "dev")
-        
+
         # Should be able to create a set
         deps_set = {dep1, dep2}
         assert len(deps_set) == 1  # Should be deduplicated
@@ -132,9 +132,9 @@ class TestLicenseReporter:
         deps = [
             DependencyInfo("requests", ">=2.25.0", "runtime"),
             DependencyInfo("pytest", ">=7.0.0", "dev"),
-            DependencyInfo("sphinx", ">=5.0.0", "optional")
+            DependencyInfo("sphinx", ">=5.0.0", "optional"),
         ]
-        
+
         filtered = reporter.filter_dependencies(deps, runtime_only=True)
         assert len(filtered) == 1
         assert filtered[0].name == "requests"
@@ -145,9 +145,9 @@ class TestLicenseReporter:
         deps = [
             DependencyInfo("requests", ">=2.25.0", "runtime"),
             DependencyInfo("pytest", ">=7.0.0", "dev"),
-            DependencyInfo("sphinx", ">=5.0.0", "optional")
+            DependencyInfo("sphinx", ">=5.0.0", "optional"),
         ]
-        
+
         filtered = reporter.filter_dependencies(deps, include_dev=True)
         assert len(filtered) == 2
         names = {dep.name for dep in filtered}
@@ -159,9 +159,9 @@ class TestLicenseReporter:
         deps = [
             DependencyInfo("requests", ">=2.25.0", "runtime"),
             DependencyInfo("pytest", ">=7.0.0", "runtime"),
-            DependencyInfo("pytest-cov", ">=4.0.0", "runtime")
+            DependencyInfo("pytest-cov", ">=4.0.0", "runtime"),
         ]
-        
+
         filtered = reporter.filter_dependencies(deps, exclude_patterns=["pytest*"])
         assert len(filtered) == 1
         assert filtered[0].name == "requests"
@@ -172,9 +172,9 @@ class TestLicenseReporter:
         deps = [
             DependencyInfo("requests", ">=2.25.0", "runtime"),
             DependencyInfo("setuptools", ">=60.0.0", "runtime"),  # Build-time package
-            DependencyInfo("pytest", ">=7.0.0", "runtime")  # Test package
+            DependencyInfo("pytest", ">=7.0.0", "runtime"),  # Test package
         ]
-        
+
         filtered = reporter.filter_dependencies(deps, runtime_only=True)
         assert len(filtered) == 1
         assert filtered[0].name == "requests"
@@ -189,7 +189,7 @@ class TestLicenseReporter:
         """Test getting package info for unknown package."""
         reporter = LicenseReporter()
         info = reporter.get_package_info("nonexistent-package-12345")
-        
+
         assert info["name"] == "nonexistent-package-12345"
         assert info["version"] == "unknown"
         assert info["license"] == "unknown"

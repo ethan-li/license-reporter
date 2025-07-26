@@ -25,10 +25,10 @@ from .cli import main
 
 __all__ = [
     "LicenseReporter",
-    "DependencyInfo", 
+    "DependencyInfo",
     "DependencyParser",
     "TextFormatter",
-    "JSONFormatter", 
+    "JSONFormatter",
     "MarkdownFormatter",
     "main",
 ]

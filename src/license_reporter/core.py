@@ -106,32 +106,79 @@ class LicenseReporter:
 
         # Build-time dependencies that should be excluded from runtime reports
         self.build_time_packages = {
-            'pip', 'setuptools', 'wheel', 'build', 'twine', 'virtualenv', 'venv',
-            'pyinstaller', 'pytest', 'mypy', 'black', 'flake8', 'isort', 'coverage',
-            'tox', 'pre-commit', 'sphinx', 'mkdocs', 'jupyter', 'notebook',
-            'ipython', 'ipykernel', 'conda', 'mamba', 'poetry', 'pipenv', 'flit',
-            'hatch', 'pdm', 'bandit', 'safety', 'autopep8', 'yapf', 'pylint',
-            'pydocstyle', 'pycodestyle', 'pyflakes', 'mccabe'
+            "pip",
+            "setuptools",
+            "wheel",
+            "build",
+            "twine",
+            "virtualenv",
+            "venv",
+            "pyinstaller",
+            "pytest",
+            "mypy",
+            "black",
+            "flake8",
+            "isort",
+            "coverage",
+            "tox",
+            "pre-commit",
+            "sphinx",
+            "mkdocs",
+            "jupyter",
+            "notebook",
+            "ipython",
+            "ipykernel",
+            "conda",
+            "mamba",
+            "poetry",
+            "pipenv",
+            "flit",
+            "hatch",
+            "pdm",
+            "bandit",
+            "safety",
+            "autopep8",
+            "yapf",
+            "pylint",
+            "pydocstyle",
+            "pycodestyle",
+            "pyflakes",
+            "mccabe",
         }
 
         # Type stub packages (not bundled in PyInstaller)
         self.type_stub_packages = {
-            'types-', 'typing-extensions', 'mypy-extensions', 'stub-'
+            "types-",
+            "typing-extensions",
+            "mypy-extensions",
+            "stub-",
         }
 
         # Testing frameworks and related packages
         self.test_packages = {
-            'pytest', 'unittest2', 'nose', 'nose2', 'testtools', 'mock',
-            'pytest-cov', 'pytest-xdist', 'pytest-mock', 'factory-boy',
-            'faker', 'hypothesis', 'tox', 'coverage', 'codecov'
+            "pytest",
+            "unittest2",
+            "nose",
+            "nose2",
+            "testtools",
+            "mock",
+            "pytest-cov",
+            "pytest-xdist",
+            "pytest-mock",
+            "factory-boy",
+            "faker",
+            "hypothesis",
+            "tox",
+            "coverage",
+            "codecov",
         }
 
     def get_package_info(self, package_name: str) -> Dict:
         """Get package information including license.
-        
+
         Args:
             package_name: Name of the package to analyze
-            
+
         Returns:
             Dictionary containing package information
         """
@@ -141,83 +188,90 @@ class LicenseReporter:
             "license": "unknown",
             "author": "unknown",
             "homepage": "unknown",
-            "requires_attribution": True  # Conservative default
+            "requires_attribution": True,  # Conservative default
         }
-        
+
         try:
             if pkg_resources:
                 dist = pkg_resources.get_distribution(package_name)
                 info["version"] = dist.version
-                
+
                 # Try to get license from metadata
-                if hasattr(dist, 'get_metadata'):
+                if hasattr(dist, "get_metadata"):
                     try:
-                        metadata = dist.get_metadata('METADATA')
-                        for line in metadata.split('\n'):
-                            if line.startswith('License:'):
-                                info["license"] = line.split(':', 1)[1].strip()
-                            elif line.startswith('Author:'):
-                                info["author"] = line.split(':', 1)[1].strip()
-                            elif line.startswith('Home-page:'):
-                                info["homepage"] = line.split(':', 1)[1].strip()
+                        metadata = dist.get_metadata("METADATA")
+                        for line in metadata.split("\n"):
+                            if line.startswith("License:"):
+                                info["license"] = line.split(":", 1)[1].strip()
+                            elif line.startswith("Author:"):
+                                info["author"] = line.split(":", 1)[1].strip()
+                            elif line.startswith("Home-page:"):
+                                info["homepage"] = line.split(":", 1)[1].strip()
                     except:
                         pass
-                        
+
         except Exception:
             pass
-            
+
         # Determine if attribution is required
         info["requires_attribution"] = self._requires_attribution(info["license"])
-        
+
         return info
-    
+
     def _requires_attribution(self, license_text: str) -> bool:
         """Determine if a license requires attribution.
-        
+
         Args:
             license_text: License text to analyze
-            
+
         Returns:
             True if attribution is required, False otherwise
         """
         license_lower = license_text.lower()
-        
+
         # Licenses that require attribution
         attribution_required = [
-            "mit", "bsd", "apache", "isc", "mpl", "mozilla",
-            "creative commons", "cc-by"
+            "mit",
+            "bsd",
+            "apache",
+            "isc",
+            "mpl",
+            "mozilla",
+            "creative commons",
+            "cc-by",
         ]
-        
+
         # Licenses that don't require attribution
-        no_attribution = [
-            "public domain", "unlicense", "wtfpl"
-        ]
-        
+        no_attribution = ["public domain", "unlicense", "wtfpl"]
+
         for license_type in no_attribution:
             if license_type in license_lower:
                 return False
-                
+
         for license_type in attribution_required:
             if license_type in license_lower:
                 return True
-                
+
         # Conservative default: require attribution if unknown
         return True
 
-    def filter_dependencies(self, dependencies: List[DependencyInfo],
-                          include_dev: bool = False,
-                          include_optional: bool = False,
-                          runtime_only: bool = False,
-                          exclude_patterns: List[str] = None) -> List[DependencyInfo]:
+    def filter_dependencies(
+        self,
+        dependencies: List[DependencyInfo],
+        include_dev: bool = False,
+        include_optional: bool = False,
+        runtime_only: bool = False,
+        exclude_patterns: List[str] = None,
+    ) -> List[DependencyInfo]:
         """Filter dependencies based on criteria.
-        
+
         Args:
             dependencies: List of dependencies to filter
             include_dev: Include development dependencies
             include_optional: Include optional dependencies
             runtime_only: Only include runtime dependencies
             exclude_patterns: List of patterns to exclude (supports wildcards)
-            
+
         Returns:
             Filtered list of dependencies
         """
@@ -226,7 +280,9 @@ class LicenseReporter:
 
         for dep in dependencies:
             # Skip if package name matches exclude patterns
-            if any(self._matches_pattern(dep.name, pattern) for pattern in exclude_patterns):
+            if any(
+                self._matches_pattern(dep.name, pattern) for pattern in exclude_patterns
+            ):
                 continue
 
             # Filter by dependency type
@@ -244,7 +300,9 @@ class LicenseReporter:
                 continue
 
             # Exclude type stub packages for runtime-only reports
-            if runtime_only and any(dep.name.startswith(stub) for stub in self.type_stub_packages):
+            if runtime_only and any(
+                dep.name.startswith(stub) for stub in self.type_stub_packages
+            ):
                 continue
 
             # Exclude test packages for runtime-only reports
@@ -257,29 +315,30 @@ class LicenseReporter:
 
     def _matches_pattern(self, name: str, pattern: str) -> bool:
         """Check if package name matches a pattern (supports wildcards).
-        
+
         Args:
             name: Package name to check
             pattern: Pattern to match against (supports * and ?)
-            
+
         Returns:
             True if name matches pattern, False otherwise
         """
         import re
+
         # Convert shell-style wildcards to regex
-        regex_pattern = pattern.replace('*', '.*').replace('?', '.')
-        return bool(re.match(f'^{regex_pattern}$', name, re.IGNORECASE))
+        regex_pattern = pattern.replace("*", ".*").replace("?", ".")
+        return bool(re.match(f"^{regex_pattern}$", name, re.IGNORECASE))
 
     def get_runtime_dependencies(self) -> Set[str]:
         """Get list of packages that are actually bundled in PyInstaller executable.
 
         This method is kept for backward compatibility with OSI integration.
-        
+
         Returns:
             Set of runtime dependency names
         """
         from .parsers import DependencyParser
-        
+
         parser = DependencyParser(self.project_root)
         all_deps = parser.get_all_dependencies()
         runtime_deps = self.filter_dependencies(all_deps, runtime_only=True)
@@ -287,7 +346,7 @@ class LicenseReporter:
 
     def get_requirements_packages(self) -> List[str]:
         """Get list of packages from requirements.txt (legacy method).
-        
+
         Returns:
             List of package names
         """
@@ -295,7 +354,7 @@ class LicenseReporter:
 
     def _detect_project_name(self) -> str:
         """Attempt to detect the project name from various sources.
-        
+
         Returns:
             Detected or fallback project name
         """
@@ -303,17 +362,21 @@ class LicenseReporter:
             import toml
         except ImportError:
             toml = None
-            
+
         # Try pyproject.toml first
         pyproject_path = self.project_root / "pyproject.toml"
         if pyproject_path.exists() and toml:
             try:
-                with open(pyproject_path, 'r', encoding='utf-8') as f:
+                with open(pyproject_path, "r", encoding="utf-8") as f:
                     data = toml.load(f)
-                if 'project' in data and 'name' in data['project']:
-                    return data['project']['name']
-                if 'tool' in data and 'poetry' in data['tool'] and 'name' in data['tool']['poetry']:
-                    return data['tool']['poetry']['name']
+                if "project" in data and "name" in data["project"]:
+                    return data["project"]["name"]
+                if (
+                    "tool" in data
+                    and "poetry" in data["tool"]
+                    and "name" in data["tool"]["poetry"]
+                ):
+                    return data["tool"]["poetry"]["name"]
             except:
                 pass
 
@@ -321,9 +384,10 @@ class LicenseReporter:
         setup_path = self.project_root / "setup.py"
         if setup_path.exists():
             try:
-                with open(setup_path, 'r', encoding='utf-8') as f:
+                with open(setup_path, "r", encoding="utf-8") as f:
                     content = f.read()
                 import re
+
                 match = re.search(r'name\s*=\s*["\']([^"\']+)["\']', content)
                 if match:
                     return match.group(1)
@@ -333,12 +397,14 @@ class LicenseReporter:
         # Fall back to directory name
         return self.project_root.name
 
-    def generate_report(self,
-                       include_dev: bool = False,
-                       include_optional: bool = False,
-                       runtime_only: bool = False,
-                       exclude_patterns: List[str] = None,
-                       project_name: str = None) -> Dict:
+    def generate_report(
+        self,
+        include_dev: bool = False,
+        include_optional: bool = False,
+        runtime_only: bool = False,
+        exclude_patterns: List[str] = None,
+        project_name: str = None,
+    ) -> Dict:
         """Generate comprehensive license report.
 
         Args:
@@ -361,7 +427,7 @@ class LicenseReporter:
             include_dev=include_dev,
             include_optional=include_optional,
             runtime_only=runtime_only,
-            exclude_patterns=exclude_patterns
+            exclude_patterns=exclude_patterns,
         )
 
         # Determine report type
@@ -383,7 +449,9 @@ class LicenseReporter:
             "project_path": str(self.project_root),
             "generated_by": "Universal Python License Reporter",
             "report_type": report_type,
-            "dependency_files": [str(f) for f in parser.discover_dependency_files().values()],
+            "dependency_files": [
+                str(f) for f in parser.discover_dependency_files().values()
+            ],
             "packages": [],
             "summary": {
                 "total_packages": 0,
@@ -391,15 +459,17 @@ class LicenseReporter:
                 "dev_packages": 0,
                 "optional_packages": 0,
                 "requires_attribution": 0,
-                "unknown_licenses": 0
+                "unknown_licenses": 0,
             },
-            "excluded_build_tools": list(self.build_time_packages) if runtime_only else [],
+            "excluded_build_tools": (
+                list(self.build_time_packages) if runtime_only else []
+            ),
             "filters_applied": {
                 "include_dev": include_dev,
                 "include_optional": include_optional,
                 "runtime_only": runtime_only,
-                "exclude_patterns": exclude_patterns or []
-            }
+                "exclude_patterns": exclude_patterns or [],
+            },
         }
 
         # Process each dependency
