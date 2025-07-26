@@ -57,11 +57,13 @@ pip install -e .
 
 ### With Optional Dependencies
 
-For enhanced functionality with TOML and YAML files:
+For enhanced functionality with YAML files:
 
 ```bash
 pip install license-reporter[enhanced]
 ```
+
+**Note**: TOML support is now included by default since `pyproject.toml` is the standard for modern Python projects.
 
 For development:
 

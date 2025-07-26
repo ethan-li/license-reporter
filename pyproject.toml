@@ -40,12 +40,13 @@ classifiers = [
     "Topic :: Utilities"
 ]
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+    "toml>=0.10.0"
+]
 
 [project.optional-dependencies]
-toml = ["toml>=0.10.0"]
 yaml = ["PyYAML>=5.1.0"]
-enhanced = ["toml>=0.10.0", "PyYAML>=5.1.0"]
+enhanced = ["PyYAML>=5.1.0"]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
@@ -53,7 +54,8 @@ dev = [
     "isort>=5.10.0",
     "flake8>=5.0.0",
     "mypy>=1.0.0",
-    "pre-commit>=2.20.0"
+    "pre-commit>=2.20.0",
+    "PyYAML>=5.1.0"
 ]
 docs = [
     "sphinx>=5.0.0",
