@@ -199,7 +199,7 @@ class DependencyParser:
         Returns:
             List of dependency information
         """
-        dependencies = []
+        dependencies: List[DependencyInfo] = []
 
         if not toml:
             print(

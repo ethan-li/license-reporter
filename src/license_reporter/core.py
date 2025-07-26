@@ -51,10 +51,10 @@ class DependencyInfo:
         self.version_spec = version_spec.strip()
         self.dep_type = dep_type  # runtime, dev, optional, build
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"DependencyInfo({self.name}, {self.version_spec}, {self.dep_type})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, DependencyInfo):
             return False
         return (
@@ -63,7 +63,7 @@ class DependencyInfo:
             and self.dep_type == other.dep_type
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.name, self.version_spec, self.dep_type))
 
 
@@ -95,7 +95,7 @@ class LicenseReporter:
         >>> print(f"Found {report['summary']['total_packages']} packages")
     """
 
-    def __init__(self, project_path: Path = None):
+    def __init__(self, project_path: Optional[Path] = None):
         """Initialize the license reporter.
 
         Args:
@@ -214,7 +214,11 @@ class LicenseReporter:
             pass
 
         # Determine if attribution is required
-        info["requires_attribution"] = self._requires_attribution(info["license"])
+        license_text = info.get("license", "")
+        if isinstance(license_text, str):
+            info["requires_attribution"] = self._requires_attribution(license_text)
+        else:
+            info["requires_attribution"] = False
 
         return info
 
@@ -261,7 +265,7 @@ class LicenseReporter:
         include_dev: bool = False,
         include_optional: bool = False,
         runtime_only: bool = False,
-        exclude_patterns: List[str] = None,
+        exclude_patterns: Optional[List[str]] = None,
     ) -> List[DependencyInfo]:
         """Filter dependencies based on criteria.
 
@@ -370,13 +374,13 @@ class LicenseReporter:
                 with open(pyproject_path, "r", encoding="utf-8") as f:
                     data = toml.load(f)
                 if "project" in data and "name" in data["project"]:
-                    return data["project"]["name"]
+                    return str(data["project"]["name"])
                 if (
                     "tool" in data
                     and "poetry" in data["tool"]
                     and "name" in data["tool"]["poetry"]
                 ):
-                    return data["tool"]["poetry"]["name"]
+                    return str(data["tool"]["poetry"]["name"])
             except:
                 pass
 
@@ -402,9 +406,9 @@ class LicenseReporter:
         include_dev: bool = False,
         include_optional: bool = False,
         runtime_only: bool = False,
-        exclude_patterns: List[str] = None,
-        project_name: str = None,
-    ) -> Dict:
+        exclude_patterns: Optional[List[str]] = None,
+        project_name: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Generate comprehensive license report.
 
         Args:
@@ -444,7 +448,7 @@ class LicenseReporter:
         if not project_name:
             project_name = self._detect_project_name()
 
-        report = {
+        report: Dict[str, Any] = {
             "project": project_name,
             "project_path": str(self.project_root),
             "generated_by": "Universal Python License Reporter",
