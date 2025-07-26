@@ -2,8 +2,9 @@
 Tests for the core module.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from license_reporter.core import DependencyInfo, LicenseReporter
 

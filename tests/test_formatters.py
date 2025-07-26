@@ -3,12 +3,13 @@ Tests for the formatters module.
 """
 
 import json
+
 import pytest
 
 from license_reporter.formatters import (
-    TextFormatter,
     JSONFormatter,
     MarkdownFormatter,
+    TextFormatter,
     get_formatter,
 )
 

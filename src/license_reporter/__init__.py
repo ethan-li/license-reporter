@@ -18,10 +18,10 @@ __version__ = "1.0.0"
 __author__ = "License Reporter Contributors"
 __email__ = "license-reporter@example.com"
 
-from .core import LicenseReporter, DependencyInfo
-from .parsers import DependencyParser
-from .formatters import TextFormatter, JSONFormatter, MarkdownFormatter
 from .cli import main
+from .core import DependencyInfo, LicenseReporter
+from .formatters import JSONFormatter, MarkdownFormatter, TextFormatter
+from .parsers import DependencyParser
 
 __all__ = [
     "LicenseReporter",

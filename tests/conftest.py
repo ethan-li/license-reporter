@@ -4,7 +4,8 @@ Pytest configuration and fixtures for license_reporter tests.
 
 import tempfile
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
 import pytest
 
 

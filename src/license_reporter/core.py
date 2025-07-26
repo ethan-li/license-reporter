@@ -5,11 +5,11 @@ This module contains the main LicenseReporter class and DependencyInfo data stru
 """
 
 import os
-import sys
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union, Any
+from typing import Any, Dict, List, Optional, Set, Union
 
 try:
     import pkg_resources

@@ -6,11 +6,12 @@ These tests verify that all components work together correctly.
 
 import json
 from pathlib import Path
+
 import pytest
 
 from license_reporter.core import LicenseReporter
-from license_reporter.parsers import DependencyParser
 from license_reporter.formatters import get_formatter
+from license_reporter.parsers import DependencyParser
 
 
 class TestIntegration:

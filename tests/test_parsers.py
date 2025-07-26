@@ -2,11 +2,12 @@
 Tests for the parsers module.
 """
 
-import pytest
 from pathlib import Path
 
-from license_reporter.parsers import DependencyParser
+import pytest
+
 from license_reporter.core import DependencyInfo
+from license_reporter.parsers import DependencyParser
 
 
 class TestDependencyParser:
