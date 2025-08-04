@@ -14,9 +14,8 @@ Features:
 - Comprehensive license detection and attribution requirements
 """
 
-__version__ = "1.0.0"
-__author__ = "License Reporter Contributors"
-__email__ = "license-reporter@example.com"
+__version__ = "1.0.1"
+__author__ = "Ethan Li"
 
 from .cli import main
 from .core import DependencyInfo, LicenseReporter

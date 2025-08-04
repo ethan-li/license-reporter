@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "license-reporter"
-version = "1.0.0"
+version = "1.0.1"
 description = "Universal Python License Report Generator for dependency compliance analysis"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "License Reporter Contributors", email = "license-reporter@example.com"}
+    {name = "Ethan Li", email = "secret"}
 ]
 maintainers = [
-    {name = "License Reporter Contributors", email = "license-reporter@example.com"}
+    {name = "License Reporter Contributors", email = "secret"}
 ]
 keywords = [
     "license",
