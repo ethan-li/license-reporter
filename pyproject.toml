@@ -12,7 +12,7 @@ authors = [
     {name = "Ethan Li", email = "aeon.zheng.li@gmail.com"}
 ]
 maintainers = [
-    {name = "License Reporter Contributors", email = "secret"}
+    {name = "Ethan Li", email = "aeon.zheng.li@gmail.com"}
 ]
 keywords = [
     "license",
