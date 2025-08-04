@@ -7,6 +7,7 @@ deduplicated in the final report.
 
 import tempfile
 from pathlib import Path
+
 import pytest
 
 from license_reporter.core import LicenseReporter
