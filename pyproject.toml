@@ -9,7 +9,7 @@ description = "Universal Python License Report Generator for dependency complian
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Ethan Li", email = "secret"}
+    {name = "Ethan Li"}
 ]
 maintainers = [
     {name = "License Reporter Contributors", email = "secret"}
