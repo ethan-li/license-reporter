@@ -333,6 +333,127 @@ class LicenseReporter:
         regex_pattern = pattern.replace("*", ".*").replace("?", ".")
         return bool(re.match(f"^{regex_pattern}$", name, re.IGNORECASE))
 
+    def _deduplicate_dependencies(self, dependencies: List[DependencyInfo]) -> List[DependencyInfo]:
+        """Deduplicate dependencies by package name, preserving the best version info.
+
+        When multiple entries exist for the same package:
+        1. Prefer more specific version constraints over less specific ones
+        2. Prefer runtime dependencies over dev/optional dependencies
+        3. Preserve source information for transparency
+
+        Args:
+            dependencies: List of dependencies that may contain duplicates
+
+        Returns:
+            List of deduplicated dependencies
+        """
+        # Group dependencies by package name (case-insensitive)
+        dep_groups: Dict[str, List[DependencyInfo]] = {}
+        for dep in dependencies:
+            key = dep.name.lower()
+            if key not in dep_groups:
+                dep_groups[key] = []
+            dep_groups[key].append(dep)
+
+        deduplicated = []
+        for group in dep_groups.values():
+            if len(group) == 1:
+                # No duplicates, keep as-is
+                deduplicated.append(group[0])
+            else:
+                # Multiple entries, need to merge
+                best_dep = self._merge_duplicate_dependencies(group)
+                deduplicated.append(best_dep)
+
+        return deduplicated
+
+    def _merge_duplicate_dependencies(self, duplicates: List[DependencyInfo]) -> DependencyInfo:
+        """Merge multiple dependency entries for the same package.
+
+        Args:
+            duplicates: List of DependencyInfo objects for the same package
+
+        Returns:
+            Single DependencyInfo object with merged information
+        """
+        # Sort by priority: runtime > optional > dev
+        type_priority = {"runtime": 0, "optional": 1, "dev": 2}
+        sorted_deps = sorted(duplicates, key=lambda d: type_priority.get(d.dep_type, 3))
+
+        # Use the highest priority dependency as base
+        best_dep = sorted_deps[0]
+
+        # Find the most specific version constraint
+        best_version = self._select_best_version_spec([dep.version_spec for dep in duplicates])
+
+        # Create merged dependency
+        return DependencyInfo(
+            name=best_dep.name,  # Use original case from highest priority
+            version_spec=best_version,
+            dep_type=best_dep.dep_type
+        )
+
+    def _select_best_version_spec(self, version_specs: List[str]) -> str:
+        """Select the most specific version specification from a list.
+
+        Args:
+            version_specs: List of version specifications
+
+        Returns:
+            The most specific version specification
+        """
+        # Remove empty specs
+        specs = [spec.strip() for spec in version_specs if spec.strip()]
+        if not specs:
+            return ""
+
+        # If only one spec, return it
+        if len(specs) == 1:
+            return specs[0]
+
+        # Prefer exact versions (==) over ranges
+        exact_specs = [spec for spec in specs if spec.startswith("==")]
+        if exact_specs:
+            return exact_specs[0]
+
+        # Prefer more restrictive lower bounds (>=)
+        ge_specs = [spec for spec in specs if spec.startswith(">=")]
+        if ge_specs:
+            # Sort by version number and take the highest minimum version
+            return max(ge_specs, key=lambda s: self._extract_version_number(s))
+
+        # Prefer any specific constraint over no constraint
+        constrained_specs = [spec for spec in specs if any(op in spec for op in [">=", "<=", ">", "<", "==", "!=", "~="])]
+        if constrained_specs:
+            return constrained_specs[0]
+
+        # Fall back to first non-empty spec
+        return specs[0]
+
+    def _extract_version_number(self, version_spec: str) -> tuple:
+        """Extract version number for comparison.
+
+        Args:
+            version_spec: Version specification like ">=2.25.0"
+
+        Returns:
+            Tuple of version components for comparison
+        """
+        import re
+
+        # Extract version number from spec
+        match = re.search(r'(\d+(?:\.\d+)*)', version_spec)
+        if match:
+            version_str = match.group(1)
+            try:
+                # Convert to tuple of integers for proper comparison
+                return tuple(int(x) for x in version_str.split('.'))
+            except ValueError:
+                pass
+
+        # Fallback for unparseable versions
+        return (0,)
+
     def get_runtime_dependencies(self) -> Set[str]:
         """Get list of packages that are actually bundled in PyInstaller executable.
 
@@ -423,11 +544,12 @@ class LicenseReporter:
         """
         from .parsers import DependencyParser
 
-        # Get all dependencies and filter them
+        # Get all dependencies, deduplicate, and filter them
         parser = DependencyParser(self.project_root)
         all_deps = parser.get_all_dependencies()
+        deduplicated_deps = self._deduplicate_dependencies(all_deps)
         filtered_deps = self.filter_dependencies(
-            all_deps,
+            deduplicated_deps,
             include_dev=include_dev,
             include_optional=include_optional,
             runtime_only=runtime_only,

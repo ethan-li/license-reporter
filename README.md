@@ -28,7 +28,13 @@ A comprehensive, project-agnostic tool for analyzing Python project dependencies
   - JSON for programmatic processing
   - Markdown for documentation
 
-- **Advanced Filtering**: 
+- **Smart Deduplication**:
+  - Automatically removes duplicate packages from multiple dependency files
+  - Preserves the most specific version constraints
+  - Prioritizes runtime dependencies over development dependencies
+  - Maintains transparency about dependency sources
+
+- **Advanced Filtering**:
   - Include/exclude development dependencies
   - Runtime-only mode for PyInstaller compliance
   - Pattern-based package exclusion
@@ -202,6 +208,24 @@ The generated reports include:
   - Author and homepage
   - Attribution requirements
   - Dependency type (runtime/dev/optional)
+
+## Smart Deduplication
+
+When your project has multiple dependency files (e.g., both `requirements.txt` and `pyproject.toml`), License Reporter automatically deduplicates packages that appear in multiple files. The deduplication logic:
+
+1. **Combines packages from all sources**: Analyzes all discovered dependency files
+2. **Removes duplicates by package name**: Case-insensitive matching
+3. **Preserves the most specific version**: Prioritizes exact versions (`==`) over ranges (`>=`)
+4. **Maintains dependency type priority**: Runtime dependencies take precedence over dev/optional
+5. **Tracks source information**: Reports which files were analyzed
+
+### Example
+
+If you have:
+- `requirements.txt`: `requests>=2.25.0`
+- `pyproject.toml`: `requests>=2.30.0`
+
+The final report will contain only one `requests` entry with version `>=2.30.0` (the more restrictive constraint).
 
 ## Supported File Formats
 
