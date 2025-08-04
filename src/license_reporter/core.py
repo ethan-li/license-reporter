@@ -333,7 +333,9 @@ class LicenseReporter:
         regex_pattern = pattern.replace("*", ".*").replace("?", ".")
         return bool(re.match(f"^{regex_pattern}$", name, re.IGNORECASE))
 
-    def _deduplicate_dependencies(self, dependencies: List[DependencyInfo]) -> List[DependencyInfo]:
+    def _deduplicate_dependencies(
+        self, dependencies: List[DependencyInfo]
+    ) -> List[DependencyInfo]:
         """Deduplicate dependencies by package name, preserving the best version info.
 
         When multiple entries exist for the same package:
@@ -367,7 +369,9 @@ class LicenseReporter:
 
         return deduplicated
 
-    def _merge_duplicate_dependencies(self, duplicates: List[DependencyInfo]) -> DependencyInfo:
+    def _merge_duplicate_dependencies(
+        self, duplicates: List[DependencyInfo]
+    ) -> DependencyInfo:
         """Merge multiple dependency entries for the same package.
 
         Args:
@@ -384,13 +388,15 @@ class LicenseReporter:
         best_dep = sorted_deps[0]
 
         # Find the most specific version constraint
-        best_version = self._select_best_version_spec([dep.version_spec for dep in duplicates])
+        best_version = self._select_best_version_spec(
+            [dep.version_spec for dep in duplicates]
+        )
 
         # Create merged dependency
         return DependencyInfo(
             name=best_dep.name,  # Use original case from highest priority
             version_spec=best_version,
-            dep_type=best_dep.dep_type
+            dep_type=best_dep.dep_type,
         )
 
     def _select_best_version_spec(self, version_specs: List[str]) -> str:
@@ -423,7 +429,11 @@ class LicenseReporter:
             return max(ge_specs, key=lambda s: self._extract_version_number(s))
 
         # Prefer any specific constraint over no constraint
-        constrained_specs = [spec for spec in specs if any(op in spec for op in [">=", "<=", ">", "<", "==", "!=", "~="])]
+        constrained_specs = [
+            spec
+            for spec in specs
+            if any(op in spec for op in [">=", "<=", ">", "<", "==", "!=", "~="])
+        ]
         if constrained_specs:
             return constrained_specs[0]
 
@@ -442,12 +452,12 @@ class LicenseReporter:
         import re
 
         # Extract version number from spec
-        match = re.search(r'(\d+(?:\.\d+)*)', version_spec)
+        match = re.search(r"(\d+(?:\.\d+)*)", version_spec)
         if match:
             version_str = match.group(1)
             try:
                 # Convert to tuple of integers for proper comparison
-                return tuple(int(x) for x in version_str.split('.'))
+                return tuple(int(x) for x in version_str.split("."))
             except ValueError:
                 pass
 
